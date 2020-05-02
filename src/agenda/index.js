@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
-import {Text, View, Dimensions, Animated, ViewPropTypes} from 'react-native';
+import {Text, View, Dimensions, Animated, ViewPropTypes, ScrollView} from 'react-native';
 import PropTypes from 'prop-types';
 import XDate from 'xdate';
 
 import {parseDate, xdateToData} from '../interface';
 import dateutils from '../dateutils';
 import CalendarList from '../calendar-list';
-import ReservationsList from './reservation-list';
 import styleConstructor from './style';
 import {VelocityTracker} from '../input';
 import {AGENDA_CALENDAR_KNOB} from '../testIDs';
@@ -44,18 +43,10 @@ export default class AgendaView extends Component {
     onDayPress: PropTypes.func,
     /** callback that gets called when day changes while scrolling agenda list */
     onDaychange: PropTypes.func,
-    /** specify how each item should be rendered in agenda */
-    renderItem: PropTypes.func,
-    /** specify how each date should be rendered. day can be undefined if the item is not first in that day. */
-    renderDay: PropTypes.func,
     /** specify how agenda knob should look like */
     renderKnob: PropTypes.func,
     /** specify how empty date content with no items should be rendered */
     renderEmptyDay: PropTypes.func,
-    /** specify what should be rendered instead of ActivityIndicator */
-    renderEmptyData: PropTypes.func,
-    /** specify your item comparison function for increased performance */
-    rowHasChanged: PropTypes.func,
     /** Max amount of months allowed to scroll to the past. Default = 50 */
     pastScrollRange: PropTypes.number,
     /** Max amount of months allowed to scroll to the future. Default = 50 */
@@ -76,22 +67,8 @@ export default class AgendaView extends Component {
     hideKnob: PropTypes.bool,
     /** Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting */
     monthFormat: PropTypes.string,
-    /** A RefreshControl component, used to provide pull-to-refresh functionality for the ScrollView. */
-    refreshControl: PropTypes.element,
-    /** If provided, a standard RefreshControl will be added for "Pull to Refresh" functionality. Make sure to also set the refreshing prop correctly. */
-    onRefresh: PropTypes.func,
-    /** Set this true while waiting for new data from a refresh. */
-    refreshing: PropTypes.bool,
     /** Display loading indicator. Default = false */
-    displayLoadingIndicator: PropTypes.bool,
-    /** Called when the user begins dragging the agenda list. **/
-    onScrollBeginDrag: PropTypes.func,
-    /** Called when the user stops dragging the agenda list. **/
-    onScrollEndDrag: PropTypes.func,
-    /** Called when the momentum scroll starts for the agenda list. **/
-    onMomentumScrollBegin: PropTypes.func,
-    /** Called when the momentum scroll stops for the agenda list. **/
-    onMomentumScrollEnd: PropTypes.func
+    displayLoadingIndicator: PropTypes.bool
   };
 
   constructor(props) {
@@ -291,32 +268,6 @@ export default class AgendaView extends Component {
     }
   }
 
-  renderReservations() {
-    return (
-      <ReservationsList
-        onScrollBeginDrag={this.props.onScrollBeginDrag}
-        onScrollEndDrag={this.props.onScrollEndDrag}
-        onMomentumScrollBegin={this.props.onMomentumScrollBegin}
-        onMomentumScrollEnd={this.props.onMomentumScrollEnd}
-        refreshControl={this.props.refreshControl}
-        refreshing={this.props.refreshing}
-        onRefresh={this.props.onRefresh}
-        rowHasChanged={this.props.rowHasChanged}
-        renderItem={this.props.renderItem}
-        renderDay={this.props.renderDay}
-        renderEmptyDate={this.props.renderEmptyDate}
-        reservations={this.props.items}
-        selectedDay={this.state.selectedDay}
-        renderEmptyData={this.props.renderEmptyData}
-        topDay={this.state.topDay}
-        onDayChange={this.onDayChange.bind(this)}
-        onScroll={() => {}}
-        ref={(c) => this.list = c}
-        theme={this.props.theme}
-      />
-    );
-  }
-
   onDayChange(day) {
     const newDate = parseDate(day);
     const withAnimation = dateutils.sameMonth(newDate, this.state.selectedDay);
@@ -414,7 +365,10 @@ export default class AgendaView extends Component {
     return (
       <View testID={this.props.testID} onLayout={this.onLayout} style={[this.props.style, {flex: 1, overflow: 'hidden'}]}>
         <View style={this.styles.reservations}>
-          {this.renderReservations()}
+          {
+            // this.renderReservations()
+            this.props.children
+          }
         </View>
         <Animated.View style={headerStyle}>
           <Animated.View style={{flex:1, transform: [{translateY: contentTranslate}]}}>

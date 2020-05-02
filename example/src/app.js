@@ -1,5 +1,7 @@
 import {Navigation} from 'react-native-navigation';
 import {registerScreens} from './screens';
+import {AppRegistry} from 'react-native';
+import {name as appName} from '../app.json';
 
 
 registerScreens();
@@ -41,3 +43,5 @@ Navigation.events().registerAppLaunchedListener(() => {
     }
   });
 });
+
+AppRegistry.registerComponent(appName, () => App)
